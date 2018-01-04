@@ -1,0 +1,90 @@
+Create a ChitFund database with 3 tables as follows
+
+---------table 1: Amount-------------
+
+with rows and constraints mentioned below
+
+chitId(primary key) not null varchar(10)
+TotalAmount not null int 
+
+---------table 2: Registration----------
+
+RegistrationNo (primary key) not null int 
+Firstname not null varchar (50)
+SecondName not null varchar(30)
+PhNo not null bigint
+Address not null varchar(50)
+ChitId not null varchar(10)
+forign key ChitId references Amount(ChitId)
+
+---------Table 3: PaymentDetails---------
+
+PaymentId not null (primary key)
+RegistrationNo not null int
+DatePaid not null Date
+ChitId not null varchar(10)
+AmtPaid not null int
+ReceivedBy not null  varchar(20)
+PaidBy not null varchar(20)
+foreign key RegistrationNo references Registration (RegistrationNo)
+
+
+------Stored Procedures------
+
+inserting data
+
+-------Registration table
+
+spInsertPeopleData
+
+Create PROC [dbo].[spInsertPeopleData]
+@registrationno int,
+@firstname varchar(30),
+@secondname varchar(11),
+@phno varchar(10),
+@address varchar(50),
+@chitid varchar(10)
+AS
+Begin
+insert into dbo.Registration(RegistrationNo, FirstName,SecondName,PhNo, Address,ChitId)
+values (@registrationno,@firstname,@secondname,@phno,@address,@chitid)
+end
+
+
+-----PaymentDetails table
+
+spInsertChitDetails
+
+create proc dbo.spInsertChitDetails
+@paymentid varchar(10),
+@registrationNo int,
+@datepaid date,
+@chitid varchar(10),
+@amtpaid int,
+@receivedby varchar(30),
+@paidby varchar(30)
+As
+Begin
+insert into dbo.PaymentDetails(PaymentId, RegistrationNo, DatePaid, ChitId, AmtPaid, ReceivedBy, PaidBy)
+values(@paymentid, @registrationNo, @datepaid, @chitid, @amtpaid, @receivedby, @paidby)
+end
+
+-----Getting data from both Registration table and PaymentDetails on selecting a particular chit id
+
+spPersonDetails:
+
+create PROC dbo.spPersonDetails
+@chitid varchar(10)
+AS
+Begin
+select R.FirstName,R.SecondName,P.ChitId,P.DatePaid,P.AmtPaid 
+from dbo.Registration As R join dbo.PaymentDetails As P
+on R.RegistrationNo = P.Registrationno 
+where P.ChitId=@chitid;
+end
+
+
+
+
+
+
